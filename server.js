@@ -16,6 +16,7 @@ const ddb = new AWS.DynamoDB.DocumentClient();
 const app = express();
 app.use(bodyParser.json());
 
+//get all payments
 app.get("/payments", async (req, res) => {
   const params = {
     TableName: tableName, // Replace with your actual DynamoDB table name
@@ -29,11 +30,12 @@ app.get("/payments", async (req, res) => {
   }
 });
 
-app.get("/userPayments", async (req, res) => {
-  const userId = req.query.userId;
+//get payments by userId
+app.get("/userPayments/:userId", async (req, res) => {
+  const userId = req.params.userId;
 
   const params = {
-    TableName: "PaymentTable", // Replace with your actual DynamoDB table name
+    TableName: tableName, // Replace with your actual DynamoDB table name
     FilterExpression: "#userId = :userId",
     ExpressionAttributeNames: {
       "#userId": "userId",
@@ -51,8 +53,9 @@ app.get("/userPayments", async (req, res) => {
   }
 });
 
-app.get("/paymentReserveId", async (req, res) => {
-  const reserveId = req.query.reserveId;
+//see a payment by reserveId
+app.get("/paymentReserveId/:reserveId", async (req, res) => {
+  const reserveId = req.params.reserveId;
 
   const params = {
     TableName: tableName, // Replace with your actual DynamoDB table name
@@ -73,8 +76,9 @@ app.get("/paymentReserveId", async (req, res) => {
   }
 });
 
-app.get("/paymentBorrowId", async (req, res) => {
-  const borrowId = req.query.borrowId;
+//see a payment by borrowId
+app.get("/paymentBorrowId/:borrowId", async (req, res) => {
+  const borrowId = req.params.borrowId;
 
   const params = {
     TableName: tableName, // Replace with your actual DynamoDB table name
@@ -95,6 +99,7 @@ app.get("/paymentBorrowId", async (req, res) => {
   }
 });
 
+//add payment to dynamoDB
 app.post("/payment", async (req, res) => {
   const params = {
     TableName: tableName,
@@ -124,7 +129,7 @@ app.put("/payment", async (req, res) => {
       id: req.body.id,
     },
     UpdateExpression:
-      "set userId = :u, reserveId = :r, status = :s, timestamp = :t, price = :p, borrowId = :b",
+      "set userId = :u, reserveId = :r, #st = :s, #ts = :t, price = :p, borrowId = :b",
     ExpressionAttributeValues: {
       ":u": req.body.userId,
       ":r": req.body.reserveId,
@@ -132,6 +137,10 @@ app.put("/payment", async (req, res) => {
       ":t": req.body.timestamp,
       ":p": req.body.price,
       ":b": req.body.borrowId,
+    },
+    ExpressionAttributeNames: {
+      "#ts": "timestamp",
+      "#st" : "status"
     },
   };
 
@@ -143,6 +152,7 @@ app.put("/payment", async (req, res) => {
   }
 });
 
+//delete payment by id
 app.delete("/payment/:id", async (req, res) => {
   const params = {
     TableName: tableName,
@@ -159,4 +169,4 @@ app.delete("/payment/:id", async (req, res) => {
   }
 });
 
-app.listen(3000, () => console.log("Server is running on port 3000"));
+app.listen(3001, () => console.log("Server is running on port 3001"));
