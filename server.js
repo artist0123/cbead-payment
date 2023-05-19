@@ -10,6 +10,7 @@ AWS.config.update({
   region: "us-east-1",
 });
 
+const port = process.env.PORT || 3000;
 const tableName = "payments";
 
 const ddb = new AWS.DynamoDB.DocumentClient();
@@ -169,4 +170,4 @@ app.delete("/payment/:id", async (req, res) => {
   }
 });
 
-app.listen(3001, () => console.log("Server is running on port 3001"));
+app.listen(port, () => console.log("Server is running on port 3000"));
