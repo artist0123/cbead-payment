@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const app = express();
 const AWS = require("aws-sdk");
+const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 
 AWS.config.update({
@@ -12,9 +14,8 @@ AWS.config.update({
 
 const port = process.env.PORT || 3000;
 const tableName = "payments";
-
+app.use(cors());
 const ddb = new AWS.DynamoDB.DocumentClient();
-const app = express();
 app.use(bodyParser.json());
 
 //get all payments
@@ -123,11 +124,11 @@ app.post("/payment", async (req, res) => {
   }
 });
 
-app.put("/payment", async (req, res) => {
+app.put("/payment/:id", async (req, res) => {
   const params = {
     TableName: tableName,
     Key: {
-      id: req.body.id,
+      id: req.params.id,
     },
     UpdateExpression:
       "set userId = :u, reserveId = :r, #st = :s, #ts = :t, price = :p, borrowId = :b",
@@ -170,4 +171,8 @@ app.delete("/payment/:id", async (req, res) => {
   }
 });
 
+<<<<<<< Updated upstream
 app.listen(port, () => console.log("Server is running on port 3000"));
+=======
+app.listen(3000, () => console.log("Server is running on port 3001"));
+>>>>>>> Stashed changes
